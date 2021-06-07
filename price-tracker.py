@@ -4,6 +4,7 @@ import re
 import time
 from bs4 import BeautifulSoup as bs
 
+
 def generate_sound(inp):
     if inp == 1:
         frequency = 2500  # Set Frequency To 2500 Hertz
@@ -12,23 +13,33 @@ def generate_sound(inp):
     elif inp == 2:
         beep = lambda x: os.system("echo -n '\a';sleep 0.2;" * x)
         beep(3)
-
+    elif inp == 3:
+        beep = lambda x: [print ("\a") for i in range (1,x)]
+        beep(3)
 
 def check_fk_price(url, amount):
-
+    global lastScanPrice
+    global lastScanPriceAllTime
+    global cutOffPrice
+    
     request = requests.get(url)
     soup = bs(request.content,'html.parser')
-
+    
     product_name = soup.find("span",{"class":"B_NuCI"}).get_text()
     price = soup.find("div",{"class":"_30jeq3 _16Jk6d"}).get_text()
     prince_int = int(''.join(re.findall(r'\d+', price)))
     print(product_name + " is at " + price)
-    if prince_int < amount:
-        print("Book Quickly")
-        generate_sound(1)
+
+    if prince_int < lastScanPrice or cutOffPrice > lastScanPrice :
+        if (lastScanPriceAllTime != -1):
+            print(f"Book Quickly!! [Now at Rs. {price}, last time it was Rs. {lastScanPrice} with all time low since scan start @ Rs {lastScanPriceAllTime}]")
+            generate_sound(3)
     else:
         print("No Slots found")
-
+    
+    lastScanPrice = prince_int 
+    if lastScanPriceAllTime > lastScanPrice and lastScanPriceAllTime == -1:
+        lastScanPriceAllTime = lastScanPrice   
 
 
 def main():
@@ -38,4 +49,8 @@ def main():
         time.sleep(3600)
 
 if __name__ == "__main__":
+    lastScanPrice = 0
+    lastScanPriceAllTime = -1
+    cutOffPrice = 93000
+    
     main()
