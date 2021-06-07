@@ -23,7 +23,7 @@ def check_fk_price(url, amount):
     price = soup.find("div",{"class":"_30jeq3 _16Jk6d"}).get_text()
     prince_int = int(''.join(re.findall(r'\d+', price)))
     print(product_name + " is at " + price)
-    if prince_int < prince_int:
+    if prince_int < amount:
         print("Book Quickly")
         generate_sound(1)
     else:
